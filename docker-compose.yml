@@ -1,0 +1,25 @@
+version: "3.8"
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    container_name: make_it_public_db
+
+  web:
+    build: .
+    volumes:
+      - .:/code
+    ports:
+      - 8000:8000
+    image: make_it_public:middleware
+    container_name: make_it_public_middleware
+    command: python manage.py runserver 0.0.0.0:8000
+    stdin_open: true
+    tty: true
+    depends_on:
+      - db

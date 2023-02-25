@@ -1,0 +1,5 @@
+Django==3.2.18
+psycopg2-binary==2.9.5
+django-allauth==0.52.0
+google-auth==2.16.1
+google-api-python-client==2.78.0
