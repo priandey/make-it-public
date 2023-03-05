@@ -301,7 +301,7 @@ class YoutubeAPI:
                 song.save()
                 songs_saved.append(song)
             except Exception as exc:
-                logger.error("Failed to sync song {}", song.id, exc_info=True)
+                logger.error("Failed to sync song %s %s", song.name, song.id, exc_info=True)
 
         logger.info(
             "Added %s youtube songs (%s) to remote playlists ",
