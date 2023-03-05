@@ -254,7 +254,7 @@ class YoutubeAPI:
                 remote_playlist.is_synched = True
                 remote_playlist.save()
                 logger.info(
-                    "Created youtube playlist: ",
+                    "Created youtube playlist: %s",
                     remote_playlist.third_party_id
                 )
             except Exception as exc:
@@ -299,7 +299,7 @@ class YoutubeAPI:
                 song.is_synched = True
                 songs_to_save.append(song)
             except Exception as exc:
-                logger.error("Failed to sync song {}", song.it, exc_info=True)
+                logger.error("Failed to sync song {}", song.id, exc_info=True)
 
         logger.info(
             "Added %s youtube songs (%s) to remote playlists ",
@@ -327,7 +327,7 @@ class YoutubeAPI:
                 request.execute()
                 songs_to_remove.append(song)
             except Exception as exc:
-                logger.error("Failed to remove song {}", song.it, exc_info=True)
+                logger.error("Failed to remove song {}", song.id, exc_info=True)
 
         logger.info(
             "Removed %s youtube songs (%s) from remote playlists ",
