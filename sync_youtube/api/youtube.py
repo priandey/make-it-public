@@ -99,7 +99,7 @@ class YoutubeAPI:
             ).values_list("third_party_id", flat=True)
         )
 
-        local_playlist = LocalPlaylist.objects.get(user=context.user)
+        local_playlist, _ = LocalPlaylist.objects.get_or_create(user=context.user)
 
         youtube_songs_to_create: List[YoutubeSong] = [
             YoutubeSong(
