@@ -280,11 +280,11 @@ class YoutubeAPI:
             remote_playlist_id__in=remote_playlist_ids,
         ).select_related("remote_playlist")
 
-        songs_to_save: List[YoutubeSong] = []
+        songs_saved: List[YoutubeSong] = []
         for song in songs_to_add:
             try:
                 request = youtube_service.playlistItems().insert(
-                    part="snippet",
+                    part="snippet,id",
                     body={
                         "snippet": {
                             "playlistId": song.remote_playlist.third_party_id,
@@ -295,18 +295,19 @@ class YoutubeAPI:
                         }
                     }
                 )
-                request.execute()
+                response = request.execute()
+                song.third_party_playlist_item_id = response.get("id", "NOT FOUND")
                 song.is_synched = True
-                songs_to_save.append(song)
+                song.save()
+                songs_saved.append(song)
             except Exception as exc:
                 logger.error("Failed to sync song {}", song.id, exc_info=True)
 
         logger.info(
             "Added %s youtube songs (%s) to remote playlists ",
-            len(songs_to_save),
-            ",".join(song.third_party_id for song in songs_to_save)
+            len(songs_saved),
+            ",".join(song.third_party_id for song in songs_saved)
         )
-        YoutubeSong.objects.bulk_update(songs_to_save, fields=["is_synched"])
 
         # -------------------------- #
         # Remove songs from playlist #
