@@ -17,7 +17,6 @@ GOOGLE_SOCIAL_APP_NAME = "google_social_app"
 GOOGLE_SERVICE_NAME_YOUTUBE = "youtube"
 YOUTUBE_CATEGORY_ID_MUSIC = "10"
 YOUTUBE_MAX_VIDEO_PER_PLAYLIST = 200
-user = User.objects.get(email="riandeypierre@gmail.com")
 
 logger = logging.getLogger("app")
 
