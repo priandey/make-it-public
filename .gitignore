@@ -137,3 +137,4 @@ data/
 django.env
 db.env
 docker-compose.override.yml
+staticfiles/
