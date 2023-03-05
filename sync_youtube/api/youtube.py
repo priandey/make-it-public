@@ -19,6 +19,8 @@ YOUTUBE_CATEGORY_ID_MUSIC = "10"
 YOUTUBE_MAX_VIDEO_PER_PLAYLIST = 200
 user = User.objects.get(email="riandeypierre@gmail.com")
 
+logger = logging.getLogger("app")
+
 
 class DummyRequest(NamedTuple):
     user: User
@@ -116,6 +118,12 @@ class YoutubeAPI:
 
         created_youtube_songs = YoutubeSong.objects.bulk_create(youtube_songs_to_create)
 
+        logger.info(
+            "Created %s youtube songs (%s)",
+            len(created_youtube_songs),
+            ",".join(created_youtube_song.third_party_id for created_youtube_song in created_youtube_songs)
+        )
+
         existing_youtube_song_third_party_ids.update(
             {song.third_party_id for song in created_youtube_songs}
         )
@@ -134,6 +142,11 @@ class YoutubeAPI:
             third_party_id__in=songs_to_remove_third_party_ids
         ).delete()
 
+        logger.info(
+            "Deleted %s youtube songs (%s)",
+            len(songs_to_remove_third_party_ids),
+            ",".join(songs_to_remove_third_party_ids)
+        )
         return created_youtube_songs
 
     @staticmethod
@@ -241,8 +254,12 @@ class YoutubeAPI:
                 remote_playlist.third_party_etag = response["etag"]
                 remote_playlist.is_synched = True
                 remote_playlist.save()
+                logger.info(
+                    "Created youtube playlist: ",
+                    remote_playlist.third_party_id
+                )
             except Exception as exc:
-                logging.error("Failed to sync RemotePlaylist %s", remote_playlist.id, exc_info=True)
+                logger.error("Failed to sync RemotePlaylist %s", remote_playlist.id, exc_info=True)
 
     @staticmethod
     def sync_remote_playlists_content(
@@ -283,8 +300,13 @@ class YoutubeAPI:
                 song.is_synched = True
                 songs_to_save.append(song)
             except Exception as exc:
-                logging.error("Failed to sync song {}", song.it, exc_info=True)
+                logger.error("Failed to sync song {}", song.it, exc_info=True)
 
+        logger.info(
+            "Added %s youtube songs (%s) to remote playlists ",
+            len(songs_to_save),
+            ",".join(song.third_party_id for song in songs_to_save)
+        )
         YoutubeSong.objects.bulk_update(songs_to_save, fields=["is_synched"])
 
         # -------------------------- #
@@ -306,6 +328,12 @@ class YoutubeAPI:
                 request.execute()
                 songs_to_remove.append(song)
             except Exception as exc:
-                logging.error("Failed to remove song {}", song.it, exc_info=True)
+                logger.error("Failed to remove song {}", song.it, exc_info=True)
+
+        logger.info(
+            "Removed %s youtube songs (%s) from remote playlists ",
+            len(songs_to_remove),
+            ",".join(song.third_party_id for song in songs_to_remove)
+        )
 
         YoutubeSong.objects.filter(id__in={song.id for song in songs_to_remove}).delete()

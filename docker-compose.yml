@@ -4,10 +4,7 @@ services:
     image: postgres
     volumes:
       - ./data/db:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+    env_file: db.env
     container_name: make_it_public_db
 
   web:
@@ -17,6 +14,7 @@ services:
     ports:
       - 8000:8000
     image: make_it_public:middleware
+    env_file: django.env
     container_name: make_it_public_middleware
     command: python manage.py runserver 0.0.0.0:8000
     stdin_open: true

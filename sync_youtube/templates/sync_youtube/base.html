@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Make it public</title>
+        <link rel="stylesheet" href="{% static 'sync_youtube/base.css' %}">
+    </head>
+    <body>
+        <div class="account-info">
+        <h1>MAKE IT PUBLIC</h1>
+        {% if not request.user.is_authenticated %}
+            <h2>
+                <form method="get" action="accounts/google/login/?process=login">
+                    {% csrf_token %}
+                    <button type="submit" class="google-btn">
+                        <img class="google-logo" src="https://cdn.cdnlogo.com/logos/g/35/google-icon.svg" alt="Google Logo">
+                        Se connecter avec Google
+                    </button>
+                </form>
+            </h2>
+        {% else %}
+            <p>Compte connecté: {{ request.user.email }}</p>
+            {% for playlist_id in user_playlist_ids %}
+                <a href="https://www.youtube.com/playlist?list={{ playlist_id }}">Partager le lien de ma playlist</a>
+            {% endfor %}
+            <div class="buttons">
+                <form method="post" action="{% url 'account_logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="google-btn">
+                        <img class="google-logo" src="https://cdn.cdnlogo.com/logos/g/35/google-icon.svg" alt="Google Logo">
+                        Se déconnecter
+                    </button>
+                </form>
+                <form method="post" action="{% url 'fetch-songs' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="google-btn">Récupérer mes musiques</button>
+                </form>
+                <form method="post" action="{% url 'publish-songs' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="google-btn">Publier mes musiques</button>
+                </form>
+            </div>
+
+        {% endif %}
+        </div>
+        <div class="main-container">
+            <div class="centered-container">
+                {% block content %}{% endblock content %}
+            </div>
+        </div>
+        <script src="{% static 'sync_youtube/base.js' %}"></script>
+    </body>
+
+</html>

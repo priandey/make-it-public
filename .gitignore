@@ -131,3 +131,6 @@ dmypy.json
 #VS Code stuff
 .vscode/
 data/
+
+django.env
+db.env
