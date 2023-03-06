@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = bool(os.getenv("DEBUG", ""))
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 
@@ -169,12 +169,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-        },
-    },
     'formatters': {
         "verbose": {
             "format": '{asctime} - [{levelname}]: {message}',
@@ -187,10 +181,16 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'verbose'
         },
+        "file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": os.getenv("APP_LOG_FILE_PATH"),
+            "formatter": "verbose",
+        },
     },
     'loggers': {
         'app': {
-            'handlers': ['console'],
+            'handlers': [os.getenv("APP_LOG_HANDLER")],
             'level': 'DEBUG',
             'propagate': False,
         },
