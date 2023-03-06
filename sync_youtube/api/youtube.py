@@ -69,17 +69,20 @@ class YoutubeAPI:
         all_items: List[Dict[str, Any]] = []
         page_token: Optional[str] = ""
         while True:
-            response = YoutubeAPI._get_videos(
-                youtube_service=youtube_service,
-                myRating="like",
-                pageToken=page_token,
-            )
-            all_items.extend(response["items"])
-            page_token = response.get("nextPageToken")
+            try:
+                response = YoutubeAPI._get_videos(
+                    youtube_service=youtube_service,
+                    myRating="like",
+                    pageToken=page_token,
+                )
+                all_items.extend(response["items"])
+                page_token = response.get("nextPageToken")
 
-            if page_token is None:
-                break
-
+                if page_token is None:
+                    break
+            except Exception:
+                logger.exception("Failed to fetch videos", exc_info=True)
+                raise
         return all_items
 
     @staticmethod
@@ -258,7 +261,7 @@ class YoutubeAPI:
                     remote_playlist.third_party_id
                 )
             except Exception as exc:
-                logger.error("Failed to sync RemotePlaylist %s", remote_playlist.id, exc_info=True)
+                logger.exception("Failed to sync RemotePlaylist %s", remote_playlist.id, exc_info=True)
 
     @staticmethod
     def sync_remote_playlists_content(
@@ -301,7 +304,7 @@ class YoutubeAPI:
                 song.save()
                 songs_saved.append(song)
             except Exception as exc:
-                logger.error("Failed to sync song %s %s", song.name, song.id, exc_info=True)
+                logger.error("Failed to sync song %s %s", song.title, song.id, exc_info=True)
 
         logger.info(
             "Added %s youtube songs (%s) to remote playlists ",
