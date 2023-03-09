@@ -46,3 +46,17 @@ def publish_songs(request: HttpRequest):
     YoutubeAPI.sync_remote_playlists(request)
     YoutubeAPI.sync_remote_playlists_content(request)
     return redirect("index", permanent=False)
+
+
+def policies(request: HttpRequest):
+    return render(
+        request,
+        template_name="sync_youtube/policies.html"
+    )
+
+
+def terms_of_service(request: HttpRequest):
+    return render(
+        request,
+        template_name="sync_youtube/terms-of-service.html"
+    )
