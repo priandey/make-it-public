@@ -119,23 +119,27 @@ SITE_ID = int(os.getenv("DJANGO_SITE_ID", 1))
 
 LOGIN_REDIRECT_URL = "/"
 
+GOOGLE_TOKEN_SCOPES = [
+    'profile',
+    'email',
+    'https://www.googleapis.com/auth/youtube'
+]
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         # For each OAuth based provider, either add a ``SocialApp``
         # (``socialaccount`` app) containing the required client
         # credentials, or list them here:
-        'SCOPE': [
-            'profile',
-            'email',
-            'https://www.googleapis.com/auth/youtube'
-        ],
+        'SCOPE': GOOGLE_TOKEN_SCOPES,
         'AUTH_PARAMS': {
             'access_type': 'offline',
         },
         'OAUTH_PKCE_ENABLED': True,
     }
 }
+
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
+if DEBUG:
+    ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http'
 
 SOCIALACCOUNT_STORE_TOKENS = True
 
