@@ -107,7 +107,7 @@ html {
     background-color: rgb(193, 174, 140);
 }
 
-img.background {
+.background {
     position: absolute;
     left: 0px;
     top: 0px;
@@ -119,10 +119,16 @@ img.background {
     filter: blur(5px);
 }
 
-img.background:hover {
+.background:hover {
     -webkit-filter: blur(1px);
     /* Safari 6.0 - 9.0 */
     filter: blur(1px);
+}
+
+.deactivated .background {
+    -webkit-filter: none;
+    /* Safari 6.0 - 9.0 */
+    filter: none;
 }
 
 p.filler {
@@ -135,6 +141,7 @@ p.filler {
     top: 15%;
     z-index: 1;
     color: wheat;
+    cursor: no-drop;
 }
 
 p.is_synched {
@@ -165,4 +172,51 @@ p.is_synched {
 
 .dropdown {
     margin-top: 5px;
+}
+
+.deactivated {
+    position: relative;
+    opacity: 0.5;
+}
+
+.deactivated::before {
+    content: "";
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    background-color: #ccc;
+    opacity: 0.5;
+    z-index: 1;
+    background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 0, 0, 0.2) 10px, rgba(0, 0, 0, 0.2) 20px);
+}
+
+.deactivated .filler {
+    cursor: copy;
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 100px;
+    background-color: black;
+    color: tomato;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    left: 20%;
+    z-index: 10;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+
+.deactivated .tooltiptext {
+    color: wheat;
 }
