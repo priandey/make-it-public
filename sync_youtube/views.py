@@ -1,5 +1,6 @@
 import logging
-from django.http import HttpRequest
+import json
+from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 from django.shortcuts import render, redirect
 
 from sync_youtube.models.song import YoutubeSong
@@ -46,6 +47,25 @@ def publish_songs(request: HttpRequest):
     YoutubeAPI.sync_remote_playlists(request)
     YoutubeAPI.sync_remote_playlists_content(request)
     return redirect("index", permanent=False)
+
+
+def switch_song(request: HttpRequest):
+    if request.method == "POST":
+        body = json.loads(request.body)
+        song_id = body.get("id")
+        if song_id is not None:
+            song = YoutubeSong.objects.filter(
+                local_playlist__user=request.user,
+                id=song_id,
+            ).first()
+            if song is None:
+                logger.warning("Failed to fetch song with id %s in user %s", song_id, request.user)
+                return HttpResponseNotFound()
+            song.should_not_be_published = not song.should_not_be_published
+            song.save()
+        return HttpResponse(status=200)
+    else:
+        return HttpResponseNotFound()
 
 
 def policies(request: HttpRequest):
