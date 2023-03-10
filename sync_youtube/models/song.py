@@ -38,6 +38,7 @@ class YoutubeSong(models.Model):
     created = models.DateField(auto_now_add=True, editable=False)
     is_synched = models.BooleanField(default=False)
     should_not_exist = models.BooleanField(default=False)
+    should_not_be_published = models.BooleanField(default=False)
 
     def __repr__(self) -> str:
         return (
