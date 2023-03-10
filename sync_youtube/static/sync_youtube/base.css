@@ -139,13 +139,13 @@ p.filler {
     left: 15%;
     right: 15%;
     top: 15%;
-    z-index: 1;
+    z-index: 10;
     color: wheat;
     cursor: no-drop;
 }
 
 p.is_synched {
-    background-color: rgba(143, 193, 140, 0.636);
+    background-color: rgba(143, 193, 140, 0.85);
 }
 
 .dropdown-content {
@@ -199,17 +199,17 @@ p.is_synched {
 /* Tooltip text */
 .tooltip .tooltiptext {
     visibility: hidden;
-    width: 100px;
+    width: 150px;
     background-color: black;
     color: tomato;
     text-align: center;
-    padding: 5px 0;
     border-radius: 6px;
 
     /* Position the tooltip text - see examples below! */
     position: absolute;
-    left: 20%;
-    z-index: 10;
+    left: 0;
+    bottom: -40px;
+    z-index: 8;
 }
 
 /* Show the tooltip text when you mouse over the tooltip container */
