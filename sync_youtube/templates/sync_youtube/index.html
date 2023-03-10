@@ -40,16 +40,28 @@
         {% endif %}
         </div>
         <div class="main-container">
+            <p hidden id="switch_song_url">{% url 'switch_song' %}</p>
+            <p hidden id="csrf_token">{% csrf_token %}</p>
             <div class="centered-container">
                 <div class="liked-songs">
                     {% for song in liked_songs %}
                         <div
-                            class="liked-song"
+                            class="liked-song {%if song.should_not_be_published %} deactivated {% endif %}"
                             onclick="window.open('https://www.youtube.com/watch?v={{song.third_party_id}}', '_blank');"
                         >
                         <img class="background" src="{{song.image_url}}"/>
-                        <p class="filler {%if song.is_synched %} is_synched {% endif %}">
+                        <p
+                            class="filler {%if song.is_synched %} is_synched {% endif %} tooltip"
+                            id="{{ song.id }}"
+                        >
                             {{song.title}}
+                            <span class="tooltiptext">
+                                {% if song.should_not_be_published%}
+                                    Partager cette musique
+                                {% else %}
+                                    Ne pas partager cette musique
+                                {% endif %}
+                            </span>
                         </p>
                         </div>
                     {% endfor %}

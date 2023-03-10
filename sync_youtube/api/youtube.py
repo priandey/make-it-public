@@ -280,8 +280,9 @@ class YoutubeAPI:
         songs_to_add = YoutubeSong.objects.filter(
             is_synched=False,
             should_not_exist=False,
+            should_not_be_published=False,
             remote_playlist_id__in=remote_playlist_ids,
-        ).select_related("remote_playlist")
+        )
 
         songs_saved: List[YoutubeSong] = []
         for song in songs_to_add:
@@ -320,23 +321,47 @@ class YoutubeAPI:
             is_synched=True,
             should_not_exist=True,
             remote_playlist_id__in=remote_playlist_ids,
-        ).select_related("remote_playlist")
+        )
 
-        songs_to_remove = []
+        removed_songs = []
         for song in songs_to_remove:
             try:
                 request = youtube_service.playlistItems().delete(
                     id=song.third_party_playlist_item_id
                 )
                 request.execute()
-                songs_to_remove.append(song)
+                removed_songs.append(song)
             except Exception as exc:
-                logger.error("Failed to remove song {}", song.id, exc_info=True)
+                logger.error("Failed to remove song %s", song.id, exc_info=True)
 
         logger.info(
             "Removed %s youtube songs (%s) from remote playlists ",
-            len(songs_to_remove),
-            ",".join(song.third_party_id for song in songs_to_remove)
+            len(removed_songs),
+            ",".join(song.third_party_id for song in removed_songs)
         )
 
         YoutubeSong.objects.filter(id__in={song.id for song in songs_to_remove}).delete()
+
+        songs_to_unpublish = YoutubeSong.objects.filter(
+            is_synched=True,
+            should_not_be_published=True,
+            remote_playlist_id__in=remote_playlist_ids,
+        )
+
+        unpublished_songs = []
+        for song in songs_to_unpublish:
+            try:
+                request = youtube_service.playlistItems().delete(
+                    id=song.third_party_playlist_item_id
+                )
+                request.execute()
+                unpublished_songs.append(song)
+            except Exception as exc:
+                logger.error("Failed to unpublish song %s", song.id, exc_info=True)
+
+        logger.info(
+            "Unpublished %s youtube songs (%s) from remote playlists ",
+            len(unpublished_songs),
+            ",".join(song.third_party_id for song in unpublished_songs)
+        )
+        YoutubeSong.objects.filter(id__in={song.id for song in unpublished_songs}).update(is_synched=False)

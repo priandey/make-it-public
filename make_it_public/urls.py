@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from sync_youtube.views import index, fetch_songs, publish_songs, policies, terms_of_service
+from sync_youtube.views import index, fetch_songs, publish_songs, policies, switch_song, terms_of_service
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -25,6 +25,7 @@ urlpatterns = [
     path("", index, name="index"),
     path("fetch-songs/", fetch_songs, name="fetch-songs"),
     path("publish-songs/", publish_songs, name="publish-songs"),
+    path("switch-song/", switch_song, name="switch_song"),
     path("policies/", policies, name="policies"),
     path("terms-of-service/", terms_of_service, name="terms_of_service"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
