@@ -9,20 +9,6 @@ html {
     align-items: baseline;
 }
 
-.centered-container {
-    margin-left: 1%;
-    margin-right: 1%;
-    column-count: 3;
-    column-fill: balance-all;
-}
-
-
-@media only screen and (min-width: 724px) {
-    .centered-container {
-        column-count: 4;
-    }
-}
-
 
 .account-info {
     text-align: center;
@@ -60,6 +46,46 @@ html {
     width: 24px;
     height: 24px;
     margin-right: 10px;
+}
+
+.liked-songs {
+    min-height: 200px;
+    min-width: 200px;
+    margin-left: 1%;
+    margin-right: 1%;
+    column-fill: balance-all;
+}
+
+.liked-songs:has(> :nth-child(-n+5):last-child) {
+    /* At most 5 children */
+    column-count: 1;
+}
+
+.liked-songs:has(> :nth-child(6)) {
+    /* At least 16 children inclusive */
+    column-count: 2;
+}
+
+@media only screen and (min-width: 724px) {
+    .liked-songs:has(> :nth-child(-n+5):last-child) {
+        /* At most 5 children */
+        column-count: 1;
+    }
+
+    .liked-songs:has(> :nth-child(6)):has(> :nth-child(-n+15):last-child) {
+        /* Between 6 and 15 children inclusive */
+        column-count: 2;
+    }
+
+    .liked-songs:has(> :nth-child(16)):has(> :nth-child(-n+25):last-child) {
+        /* At least 16 children inclusive */
+        column-count: 3;
+    }
+
+    .liked-songs:has(> :nth-child(26)) {
+        /* At least 26 children inclusive */
+        column-count: 4;
+    }
 }
 
 .liked-song {
