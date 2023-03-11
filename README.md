@@ -2,6 +2,6 @@
 Publish your youtube liked playlist
 
 ## TO DO
-- Unit tests
-- Frontend 🥵
-- Deployment structure
+- [x] Unit tests (97% coverage, let's keep it high)
+- [ ] Improve Frontend
+- [ ] Add triggers to branch
