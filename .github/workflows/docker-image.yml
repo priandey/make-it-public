@@ -1,0 +1,23 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Docker compose tests run
+      uses: cloudposse/github-action-docker-compose-test-run@0.1.2
+      with:
+        file: docker-compose.ci.yml
+        service: web
+        entrypoint: python
+        command: manage.py test -v2
