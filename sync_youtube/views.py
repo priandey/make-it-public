@@ -17,7 +17,10 @@ def index(request: HttpRequest):
     if request.user.is_authenticated:
         liked_songs.extend(
             list(
-                YoutubeSong.objects.filter(local_playlist__user=request.user).order_by(
+                YoutubeSong.objects.filter(
+                    local_playlist__user=request.user,
+                    should_not_exist=False,
+                ).order_by(
                     "should_not_be_published",
                     "is_synched",
                     "title",

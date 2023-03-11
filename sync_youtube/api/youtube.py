@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, NamedTuple, Optional, Set, Union
+from typing import Any, Dict, List, NamedTuple, Optional, Set, Tuple, Union
 from django.http import HttpRequest
 from django.contrib.auth.models import User
 from math import ceil
@@ -79,7 +79,7 @@ class YoutubeAPI:
     @staticmethod
     def extract_liked_musics(
         context: Union[HttpRequest, DummyRequest],
-    ) -> List[YoutubeSong]:
+    ) -> Tuple[List[YoutubeSong], Set[str]]:
         all_liked_videos = YoutubeAPI.get_liked_videos(context)
         all_likeds_music = [
             video
@@ -132,26 +132,27 @@ class YoutubeAPI:
 
         YoutubeSong.objects.filter(
             user=context.user,
-            third_party_id__in=songs_to_remove_third_party_ids
+            third_party_id__in=songs_to_remove_third_party_ids,
+            is_synched=False,
         ).delete()
+
+        YoutubeSong.objects.filter(
+            user=context.user,
+            third_party_id__in=songs_to_remove_third_party_ids,
+            is_synched=True,
+        ).update(should_not_exist=True)
 
         logger.info(
             "Deleted %s youtube songs (%s)",
             len(songs_to_remove_third_party_ids),
             ",".join(songs_to_remove_third_party_ids)
         )
-        return created_youtube_songs
+        return created_youtube_songs, songs_to_remove_third_party_ids
 
     @staticmethod
     def make_playlists_split(
         context: Union[HttpRequest, DummyRequest],
     ) -> None:
-        YoutubeSong.objects.filter(
-            local_playlist__user=context.user,
-            is_synched=False,
-            should_not_exist=True,
-        ).delete()  # Remove non-synched songs that should not be synched
-
         local_playlist = LocalPlaylist.objects.prefetch_related('songs', 'remote_playlists').get(user=context.user)
         non_full_remote_playlists = list(
             local_playlist.remote_playlists.annotate(
@@ -231,8 +232,8 @@ class YoutubeAPI:
         youtube_service = YoutubeAPI._get_youtube_service(context=context)
         for remote_playlist in RemotePlaylist.objects.filter(is_synched=False, local_playlist__user=context.user):
             try:
-                request = youtube_service.playlists().insert(
-                    part="snippet,status",
+                response = youtube_service.playlists().insert(
+                    part="snippet, status",
                     body={
                         "snippet": {
                             "title": remote_playlist.title,
@@ -241,8 +242,8 @@ class YoutubeAPI:
                             "privacyStatus": "public"
                         }
                     }
-                )
-                response = request.execute()
+                ).execute()
+
                 remote_playlist.third_party_id = response["id"]
                 remote_playlist.third_party_etag = response["etag"]
                 remote_playlist.is_synched = True
@@ -251,7 +252,7 @@ class YoutubeAPI:
                     "Created youtube playlist: %s",
                     remote_playlist.third_party_id
                 )
-            except Exception as exc:
+            except Exception:
                 logger.exception("Failed to sync RemotePlaylist %s", remote_playlist.id, exc_info=True)
 
     @staticmethod
@@ -278,7 +279,7 @@ class YoutubeAPI:
         songs_saved: List[YoutubeSong] = []
         for song in songs_to_add:
             try:
-                request = youtube_service.playlistItems().insert(
+                response = youtube_service.playlistItems().insert(
                     part="snippet,id",
                     body={
                         "snippet": {
@@ -289,13 +290,12 @@ class YoutubeAPI:
                             }
                         }
                     }
-                )
-                response = request.execute()
+                ).execute()
                 song.third_party_playlist_item_id = response.get("id", "NOT FOUND")
                 song.is_synched = True
                 song.save()
                 songs_saved.append(song)
-            except Exception as exc:
+            except Exception:
                 logger.error("Failed to sync song %s %s", song.title, song.id, exc_info=True)
 
         logger.info(
@@ -317,12 +317,11 @@ class YoutubeAPI:
         removed_songs = []
         for song in songs_to_remove:
             try:
-                request = youtube_service.playlistItems().delete(
+                youtube_service.playlistItems().delete(
                     id=song.third_party_playlist_item_id
-                )
-                request.execute()
+                ).execute()
                 removed_songs.append(song)
-            except Exception as exc:
+            except Exception:
                 logger.error("Failed to remove song %s", song.id, exc_info=True)
 
         logger.info(
@@ -342,12 +341,11 @@ class YoutubeAPI:
         unpublished_songs = []
         for song in songs_to_unpublish:
             try:
-                request = youtube_service.playlistItems().delete(
+                youtube_service.playlistItems().delete(
                     id=song.third_party_playlist_item_id
-                )
-                request.execute()
+                ).execute()
                 unpublished_songs.append(song)
-            except Exception as exc:
+            except Exception:
                 logger.error("Failed to unpublish song %s", song.id, exc_info=True)
 
         logger.info(
