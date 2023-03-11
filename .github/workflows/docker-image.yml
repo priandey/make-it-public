@@ -17,10 +17,7 @@ jobs:
     - name: Docker compose tests run
       uses: cloudposse/github-action-docker-compose-test-run@0.1.2
       with:
-        # Docker compose file
         file: docker-compose.ci.yml
-        # Service run tests inside
         service: web
-        entrypoint: /code
-        # Command to run tests
-        command: python ./manage.py test -v2
+        entrypoint: python
+        command: manage.py test -v2
