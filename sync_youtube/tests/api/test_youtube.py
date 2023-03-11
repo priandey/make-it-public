@@ -1,68 +1,19 @@
-from datetime import timedelta
 from typing import Any, Dict
 from unittest.mock import MagicMock, NonCallableMagicMock, call, patch
-from django.test import TestCase
-from django.utils import timezone
-from django.contrib.auth.models import User
-from allauth.socialaccount.models import SocialAccount, SocialApp, SocialToken
-from allauth.socialaccount.providers.google.provider import GoogleProvider
+from sync_youtube.tests.shared import SyncYoutubeTestCase
 from google.oauth2.credentials import Credentials
 from sync_youtube.api.youtube import (
     GOOGLE_OAUTH2_URI,
     GOOGLE_SERVICE_NAME_YOUTUBE,
-    GOOGLE_SOCIAL_APP_NAME,
     GOOGLE_YOUTUBE_SERVICE_VERSION,
     YOUTUBE_CATEGORY_ID_MUSIC,
-    DummyRequest,
     YoutubeAPI
 )
-from sync_youtube.models.playlist import LocalPlaylist, RemotePlaylist
+from sync_youtube.models.playlist import RemotePlaylist
 from sync_youtube.models.song import YoutubeSong
 
 
-class YoutubeAPITestCase(TestCase):
-
-    @classmethod
-    def setUpTestData(cls) -> None:
-        cls.user = User.objects.create(username="Test User", email="test_user@test.te")
-        cls.local_playlist = LocalPlaylist.objects.create(user=cls.user)
-        cls.social_account = SocialAccount.objects.create(
-            user=cls.user,
-            provider=GoogleProvider.id,
-            uid="0123456789",
-            extra_data={
-                'at_hash': 'GyMEAKNRJ4nSNACXiOILpg',
-                'aud': '987654321.apps.googleusercontent.com',
-                'azp': '987654321.apps.googleusercontent.com',
-                'email': 'testuser-1234@pages.plusgoogle.com',
-                'email_verified': True,
-                'exp': 1678380246,
-                'given_name': 'Test User',
-                'iat': 1678376646,
-                'iss': 'https://accounts.google.com',
-                'locale': 'fr',
-                'name': 'Test User',
-                'picture': 'http://example.com/img.jpg',
-                'sub': '0123456789'
-            }
-        )
-        cls.social_app = SocialApp.objects.create(
-            provider=GoogleProvider.id,
-            name=GOOGLE_SOCIAL_APP_NAME,
-            client_id="123123123",
-            secret="iamthesecret",
-            key="iamthekey",
-        )
-        cls.social_token = SocialToken.objects.create(
-            account=cls.social_account,
-            app=cls.social_app,
-            expires_at=timezone.now() + timedelta(hours=2),
-            token="1234567890987654321",
-            token_secret="AZERTYUIOP"
-        )
-        cls.context = DummyRequest(user=cls.user)
-        return super().setUpTestData()
-
+class YoutubeAPITestCase(SyncYoutubeTestCase):
     def test__get_user_credentials_success(self):
         expected_credentials = Credentials(
             token=self.social_token.token,
