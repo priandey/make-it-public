@@ -15,6 +15,8 @@ from sync_youtube.models.song import YoutubeSong
 GOOGLE_ACCOUNT_PROVIDER = "google"
 GOOGLE_SOCIAL_APP_NAME = "google_social_app"
 GOOGLE_SERVICE_NAME_YOUTUBE = "youtube"
+GOOGLE_YOUTUBE_SERVICE_VERSION = "v3"
+GOOGLE_OAUTH2_URI = 'https://oauth2.googleapis.com/token'
 YOUTUBE_CATEGORY_ID_MUSIC = "10"
 YOUTUBE_MAX_VIDEO_PER_PLAYLIST = 200
 
@@ -35,7 +37,7 @@ class YoutubeAPI:
         credentials = Credentials(
             token=token.token,
             refresh_token=token.token_secret,
-            token_uri='https://oauth2.googleapis.com/token',
+            token_uri=GOOGLE_OAUTH2_URI,
             client_id=social_app.client_id,
             client_secret=social_app.secret,
         )
@@ -46,19 +48,7 @@ class YoutubeAPI:
         context: Union[HttpRequest, DummyRequest],
     ) -> Resource:
         credentials = YoutubeAPI._get_user_credentials(context)
-        return discovery.build(GOOGLE_SERVICE_NAME_YOUTUBE, 'v3', credentials=credentials)
-
-    @staticmethod
-    def _get_videos(
-        youtube_service: Resource,
-        **kwargs
-    ) -> Dict[str, Any]:
-        request = youtube_service.videos().list(
-            part="snippet",
-            maxResults=50,
-            **kwargs
-        )
-        return request.execute()
+        return discovery.build(GOOGLE_SERVICE_NAME_YOUTUBE, GOOGLE_YOUTUBE_SERVICE_VERSION, credentials=credentials)
 
     @staticmethod
     def get_liked_videos(
@@ -70,11 +60,12 @@ class YoutubeAPI:
         page_token: Optional[str] = ""
         while True:
             try:
-                response = YoutubeAPI._get_videos(
-                    youtube_service=youtube_service,
+                response = youtube_service.videos().list(
+                    part="snippet",
+                    maxResults=50,
                     myRating="like",
                     pageToken=page_token,
-                )
+                ).execute()
                 all_items.extend(response["items"])
                 page_token = response.get("nextPageToken")
 
