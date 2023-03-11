@@ -14,8 +14,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag make-it-public:$(date +%s)
+    # - name: Build the Docker image
+    #   run: docker build . --file Dockerfile --tag make-it-public:$(date +%s)
     - name: Docker compose tests run
       uses: cloudposse/github-action-docker-compose-test-run@0.1.2
       with:
@@ -24,4 +24,4 @@ jobs:
         # Service run tests inside
         service: web
         # Command to run tests
-        command: python manage.py test -v2
+        command: python3 manage.py test -v2
