@@ -21,5 +21,6 @@ jobs:
         file: docker-compose.ci.yml
         # Service run tests inside
         service: web
+        entrypoint: /code
         # Command to run tests
-        command: docker-compose run web python3 manage.py test -v2
+        command: python ./manage.py test -v2
