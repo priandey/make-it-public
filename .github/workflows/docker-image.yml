@@ -20,7 +20,7 @@ jobs:
       uses: cloudposse/github-action-docker-compose-test-run@0.1.2
       with:
         # Docker compose file
-        file: docker-compose.yml
+        file: docker-compose.ci.yml
         # Service run tests inside
         service: web
         # Command to run tests
