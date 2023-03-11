@@ -225,7 +225,7 @@ class ViewsTestCase(SyncYoutubeTestCase):
             is_synched=False,
             should_not_be_published=True,
         )
-        other_user = User.objects.create_user(username="foo", password="bar")
+        User.objects.create_user(username="foo", password="bar")
         client = Client()
         client.login(username="foo", password="bar")
 
