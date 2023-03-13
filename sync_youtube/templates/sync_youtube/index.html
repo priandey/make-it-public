@@ -33,7 +33,7 @@
                 </form>
                 <form method="post" action="{% url 'publish-songs' %}">
                     {% csrf_token %}
-                    <button type="submit" class="google-btn">Publier mes musiques</button>
+                    <button type="submit" class="google-btn">Synchroniser mes playlists</button>
                 </form>
             </div>
 
@@ -42,30 +42,19 @@
         <div class="main-container">
             <p hidden id="switch_song_url">{% url 'switch_song' %}</p>
             <p hidden id="csrf_token">{% csrf_token %}</p>
-            <div class="centered-container">
-                <div class="liked-songs">
-                    {% for song in liked_songs %}
-                        <div
-                            class="liked-song {%if song.should_not_be_published %} deactivated {% endif %}"
-                            onclick="window.open('https://www.youtube.com/watch?v={{song.third_party_id}}', '_blank');"
-                        >
-                        <img class="background" src="{{song.image_url}}"/>
-                        <p
-                            class="filler {%if song.is_synched %} is_synched {% endif %} tooltip"
-                            id="{{ song.id }}"
-                        >
-                            {{song.title}}
-                            <span class="tooltiptext">
-                                {% if song.should_not_be_published%}
-                                    Partager cette musique
-                                {% else %}
-                                    Ne pas partager cette musique
-                                {% endif %}
-                            </span>
-                        </p>
-                        </div>
-                    {% endfor %}
-                </div>
+            <div class="remote-playlist">
+            {% for song in liked_songs %}
+                <p
+                    class="liked-song {%if song.is_synched %} is_synched {% endif %}"
+                    id="{{ song.id }}"
+                    youtube_id="{{ song.third_party_id }}"
+                    remote_playlist_id="{{ song.remote_playlist_id }}"
+                    is_synched="{% if song.is_syched %} true {%endif%}"
+                    should_not_be_published="{% if song.should_not_be_published %} true {% endif %}"
+                >
+                    {{song.title}}
+                </p>
+            {% endfor %}
             </div>
         </div>
 {% endblock content %}

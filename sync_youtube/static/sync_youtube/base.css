@@ -3,13 +3,6 @@ html {
     background-color: tomato;
 }
 
-.main-container {
-    display: flex;
-    justify-content: center;
-    align-items: baseline;
-}
-
-
 .account-info {
     text-align: center;
     margin-bottom: 10px;
@@ -36,187 +29,29 @@ html {
     box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.25);
 }
 
-.dropdown-btn:hover {
-    background-color: #1976D2;
-    box-shadow: 0px 3px 7px rgba(0, 0, 0, 0.3);
-    transform: translateY(-2px);
-}
-
 .google-logo {
     width: 24px;
     height: 24px;
     margin-right: 10px;
 }
 
-.liked-songs {
-    min-height: 200px;
-    min-width: 200px;
-    margin-left: 1%;
-    margin-right: 1%;
-    column-fill: balance-all;
+.remote-playlist {
+    min-width: 30%;
+    border: 2px dotted rgba(0, 0, 0, 0.25);
 }
 
-.liked-songs:has(> :nth-child(-n+5):last-child) {
-    /* At most 5 children */
-    column-count: 1;
-}
-
-.liked-songs:has(> :nth-child(6)) {
-    /* At least 16 children inclusive */
-    column-count: 2;
-}
-
-@media only screen and (min-width: 724px) {
-    .liked-songs:has(> :nth-child(-n+5):last-child) {
-        /* At most 5 children */
-        column-count: 1;
-    }
-
-    .liked-songs:has(> :nth-child(6)):has(> :nth-child(-n+15):last-child) {
-        /* Between 6 and 15 children inclusive */
-        column-count: 2;
-    }
-
-    .liked-songs:has(> :nth-child(16)):has(> :nth-child(-n+25):last-child) {
-        /* At least 16 children inclusive */
-        column-count: 3;
-    }
-
-    .liked-songs:has(> :nth-child(26)) {
-        /* At least 26 children inclusive */
-        column-count: 4;
-    }
-}
-
-.liked-song {
+p.liked-song {
     position: relative;
-    display: inline-block;
-    min-width: 100%;
-    aspect-ratio: 1.4;
-    align-items: center;
-    justify-content: center;
-    background-color: rgb(236, 159, 159);
-    color: tomato;
-    padding: 5px 5px 5px 5px;
-    border-radius: 5px;
-    margin: 1px 1px 1px 1px;
-    cursor: pointer;
-}
-
-.liked-song:hover {
-    background-color: rgb(193, 174, 140);
-}
-
-.background {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    z-index: 0;
-    width: 100%;
-    height: 100%;
-    -webkit-filter: blur(5px);
-    /* Safari 6.0 - 9.0 */
-    filter: blur(5px);
-}
-
-.background:hover {
-    -webkit-filter: blur(1px);
-    /* Safari 6.0 - 9.0 */
-    filter: blur(1px);
-}
-
-.deactivated .background {
-    -webkit-filter: none;
-    /* Safari 6.0 - 9.0 */
-    filter: none;
-}
-
-p.filler {
-    position: absolute;
+    display: block;
+    margin: 2px 2px;
     text-align: center;
+    width: 100%;
     background-color: #b142369b;
     border-radius: 2px;
-    left: 15%;
-    right: 15%;
-    top: 15%;
-    z-index: 10;
+    z-index: 0;
     color: wheat;
-    cursor: no-drop;
 }
 
 p.is_synched {
     background-color: rgba(143, 193, 140, 0.85);
-}
-
-.dropdown-content {
-    display: none;
-    z-index: 1;
-    margin-top: 4px;
-}
-
-.dropdown-btn:hover+.dropdown-content {
-    display: block;
-}
-
-.dropdown-btn:focus+.dropdown-content {
-    display: block;
-}
-
-.dropdown-btn:hover+.dropdown-item {
-    display: block;
-}
-
-.dropdown-btn:focus+.dropdown-item {
-    display: block;
-}
-
-.dropdown {
-    margin-top: 5px;
-}
-
-.deactivated {
-    position: relative;
-    opacity: 0.5;
-}
-
-.deactivated::before {
-    content: "";
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    height: 100%;
-    background-color: #ccc;
-    opacity: 0.5;
-    z-index: 1;
-    background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 0, 0, 0.2) 10px, rgba(0, 0, 0, 0.2) 20px);
-}
-
-.deactivated .filler {
-    cursor: copy;
-}
-
-/* Tooltip text */
-.tooltip .tooltiptext {
-    visibility: hidden;
-    width: 150px;
-    background-color: black;
-    color: tomato;
-    text-align: center;
-    border-radius: 6px;
-
-    /* Position the tooltip text - see examples below! */
-    position: absolute;
-    left: 0;
-    bottom: -40px;
-    z-index: 8;
-}
-
-/* Show the tooltip text when you mouse over the tooltip container */
-.tooltip:hover .tooltiptext {
-    visibility: visible;
-}
-
-.deactivated .tooltiptext {
-    color: wheat;
 }

@@ -7,9 +7,13 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>Make it public</title>
         <link rel="stylesheet" href="{% static 'sync_youtube/base.css' %}">
+        <link rel="stylesheet" href="{% static 'sync_youtube/dragula.css' %}">
     </head>
     <body>
         {% block content %}{% endblock content %}
+        <script src="https://unpkg.com/vanilla-context-menu@1.4.1/dist/vanilla-context-menu.js"></script>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.3/dragula.min.js'></script>
+        <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
         <script src="{% static 'sync_youtube/base.js' %}"></script>
     </body>
     <footer>
