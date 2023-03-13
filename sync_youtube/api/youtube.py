@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from math import ceil
 from django.db.models import Count
 from googleapiclient import discovery
+from googleapiclient.errors import Error as GoogleError
 from googleapiclient.discovery import Resource
 from google.oauth2.credentials import Credentials
 from allauth.socialaccount.models import SocialToken, SocialApp
@@ -66,14 +67,16 @@ class YoutubeAPI:
                     myRating="like",
                     pageToken=page_token,
                 ).execute()
+            except Exception:
+                logger.exception("Failed to fetch videos", exc_info=True)
+                raise
+            else:
                 all_items.extend(response["items"])
                 page_token = response.get("nextPageToken")
 
                 if page_token is None:
                     break
-            except Exception:
-                logger.exception("Failed to fetch videos", exc_info=True)
-                raise
+
         return all_items
 
     @staticmethod
@@ -243,7 +246,9 @@ class YoutubeAPI:
                         }
                     }
                 ).execute()
-
+            except Exception:
+                logger.exception("Failed to sync RemotePlaylist %s", remote_playlist.id, exc_info=True)
+            else:
                 remote_playlist.third_party_id = response["id"]
                 remote_playlist.third_party_etag = response["etag"]
                 remote_playlist.is_synched = True
@@ -252,8 +257,6 @@ class YoutubeAPI:
                     "Created youtube playlist: %s",
                     remote_playlist.third_party_id
                 )
-            except Exception:
-                logger.exception("Failed to sync RemotePlaylist %s", remote_playlist.id, exc_info=True)
 
     @staticmethod
     def sync_remote_playlists_content(
@@ -291,12 +294,13 @@ class YoutubeAPI:
                         }
                     }
                 ).execute()
+            except Exception:
+                logger.error("Failed to sync song %s %s", song.title, song.id, exc_info=True)
+            else:
                 song.third_party_playlist_item_id = response.get("id", "NOT FOUND")
                 song.is_synched = True
                 song.save()
                 songs_saved.append(song)
-            except Exception:
-                logger.error("Failed to sync song %s %s", song.title, song.id, exc_info=True)
 
         logger.info(
             "Added %s youtube songs (%s) to remote playlists ",
@@ -320,10 +324,10 @@ class YoutubeAPI:
                 youtube_service.playlistItems().delete(
                     id=song.third_party_playlist_item_id
                 ).execute()
-                removed_songs.append(song)
             except Exception:
                 logger.error("Failed to remove song %s", song.id, exc_info=True)
-
+            else:
+                removed_songs.append(song)
         logger.info(
             "Removed %s youtube songs (%s) from remote playlists ",
             len(removed_songs),
@@ -344,9 +348,10 @@ class YoutubeAPI:
                 youtube_service.playlistItems().delete(
                     id=song.third_party_playlist_item_id
                 ).execute()
-                unpublished_songs.append(song)
             except Exception:
                 logger.error("Failed to unpublish song %s", song.id, exc_info=True)
+            else:
+                unpublished_songs.append(song)
 
         logger.info(
             "Unpublished %s youtube songs (%s) from remote playlists ",
