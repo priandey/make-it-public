@@ -114,7 +114,7 @@ class ViewsTestCase(SyncYoutubeTestCase):
         mocked_make_playlist_split: MagicMock,
         mocked_extract_liked_musics: MagicMock,
     ):
-        response = self.anonymous_client.get("/fetch-songs/")
+        response = self.logged_in_client.get("/fetch-songs/")
 
         mocked_extract_liked_musics.assert_called_once_with(response.wsgi_request)
         mocked_make_playlist_split.assert_called_once_with(response.wsgi_request)
@@ -132,7 +132,7 @@ class ViewsTestCase(SyncYoutubeTestCase):
         mocked_sync_remote_playlists_content: MagicMock,
         mocked_sync_remote_playlists: MagicMock,
     ):
-        response = self.anonymous_client.get("/publish-songs/")
+        response = self.logged_in_client.get("/publish-songs/")
 
         mocked_sync_remote_playlists_content.assert_called_once_with(response.wsgi_request)
         mocked_sync_remote_playlists.assert_called_once_with(response.wsgi_request)
@@ -146,7 +146,7 @@ class ViewsTestCase(SyncYoutubeTestCase):
     def test_switch_song_get_error(self):
         response = self.anonymous_client.get('/switch-song/')
         self.assertEqual(
-            404,
+            302,
             response.status_code,
             "Response status was not 404"
         )

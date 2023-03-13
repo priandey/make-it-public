@@ -2,7 +2,7 @@ import logging
 import json
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 from django.shortcuts import render, redirect
-
+from django.contrib.auth.decorators import login_required
 from sync_youtube.models.song import YoutubeSong
 from sync_youtube.models.playlist import RemotePlaylist
 from sync_youtube.api.youtube import YoutubeAPI
@@ -60,19 +60,21 @@ def terms_of_service(request: HttpRequest):
 
 # FIXME Following views should probably request being logged in
 
-
+@login_required(login_url="/")
 def fetch_songs(request: HttpRequest):
     YoutubeAPI.extract_liked_musics(request)
     YoutubeAPI.make_playlists_split(request)
     return redirect("index", permanent=True)
 
 
+@login_required(login_url="/")
 def publish_songs(request: HttpRequest):
     YoutubeAPI.sync_remote_playlists(request)
     YoutubeAPI.sync_remote_playlists_content(request)
     return redirect("index", permanent=True)
 
 
+@login_required(login_url="/")
 def switch_song(request: HttpRequest):
     if request.method == "POST":
         body = json.loads(request.body)
